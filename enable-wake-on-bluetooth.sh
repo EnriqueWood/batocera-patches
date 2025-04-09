@@ -1,5 +1,5 @@
 #!/bin/bash
-## This script enables wake from suspension capabilities to every device (useful for bluetooth controllers)
+## This script enables wake from suspension capabilities to every bluetooth device (useful for bluetooth controllers)
 
 cat <<EOF2 > /userdata/system/services/wake_on_bluetooth
 #!/bin/bash
@@ -64,7 +64,7 @@ case "\$1" in
         check_enabled
         ;;
     *)
-        echo "Usage: \$0 {start|stop}"
+        echo "Usage: \$0 {start|status|stop}"
         exit 1
         ;;
 esac
