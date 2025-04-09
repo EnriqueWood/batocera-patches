@@ -4,9 +4,12 @@ This repo is to test new ideas or patch functionalities in batocera.
 
 Everything here is tested in v41 stable, but should work in butterfly/beta and lower versions as well
 
+---
 ## Wake on bluetooth functionality
 
-You can test the wake on bluetooth functionality by running on f1/xterm or via ssh to your batocera machine the following command:
+This allows you to wake up your console from sleep/suspension by turning on your bluetooth controller.
+
+To enable this functionality in your system, just run on f1/xterm or via ssh to your batocera machine the following command:
 
 ```bash
 wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main/enable-wake-on-bluetooth.sh | bash
@@ -14,11 +17,13 @@ wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/hea
 
 This will create a service in `Main Menu -> System Settings -> Services -> WAKE_ON_BLUETOOTH`, where you can toggle it on or off. 
 
-The service is enabled by default
+#### The service is enabled by default.
 
 ✔️ Tested with Ps4, Ps5 (DualSense) and Xbox One controllers.
 
-To be able to wake your system, it has to be in Suspension mode `Main Menu -> Quit -> Suspend System` instead of powered off.
+Note: To be able to wake your system, it has to be in Suspension mode `Main Menu -> Quit -> Suspend System` instead of powered off.
+
+---
 
 ## Hooks for suspend and resume events
 
