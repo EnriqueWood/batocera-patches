@@ -70,4 +70,5 @@ case "\$1" in
 esac
 EOF2
 chmod +x /userdata/system/services/wake_on_bluetooth
+batocera-services enable wake_on_bluetooth
 batocera-services start wake_on_bluetooth
