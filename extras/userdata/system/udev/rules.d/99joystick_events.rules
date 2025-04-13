@@ -1,0 +1,5 @@
+ENV{ID_INPUT_JOYSTICK}=="1", KERNEL=="js[0-9]*", ACTION=="add", \
+RUN+="/bin/bash -c 'DIR=/userdata/system/configs/emulationstation/scripts/controller-connected; DEV=\"%E{DEVNAME}\"; if [[ -d \"$DIR\" ]]; then for script in \"$DIR\"/*; do [ -x \"$script\" ] && /bin/bash \"$script\" \"$DEV\" >> /userdata/system/logs/udev.log 2>&1 & done; fi'"
+
+ENV{ID_INPUT_JOYSTICK}=="1", KERNEL=="js[0-9]*", ACTION=="remove", \
+RUN+="/bin/bash -c 'DIR=/userdata/system/configs/emulationstation/scripts/controller-disconnected; DEV=\"%E{DEVNAME}\"; if [[ -d \"$DIR\" ]]; then for script in \"$DIR\"/*; do [ -x \"$script\" ] && /bin/bash \"$script\" \"$DEV\" >> /userdata/system/logs/udev.log 2>&1 & done; fi'"

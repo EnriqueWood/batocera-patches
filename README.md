@@ -27,14 +27,31 @@ Note: To be able to wake your system, it has to be in Suspension mode `Main Menu
 
 ## Hooks for suspend and resume events
 
-You can test the wake on bluetooth functionality by running on f1/xterm or via ssh to your batocera machine the following command:
+Enable hooks for scripts placed in /userdata/system/configs/emulationstation/scripts/suspend and /userdata/system/configs/emu
+lationstation/scripts/resume, the scripts must be executable (execution bit should be set for them to be triggered)
+
+Enable this functionality by running:
 
 ```bash
-wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main/enable-suspend-resume-user-script-hooks.sh bash
+wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main/enable-suspend-resume-user-script-hooks.sh | bash
 ```
 
 This hook is very useful to do something like calling a wakeonlan/poweroff service from your home assistant to turn on or off your TV, making the experience more console-like.
 
+Note: these hooks pass no arguments to the scripts
+
+---
+
+## Hooks for joystick added or removed
+
+Enable hooks for scripts placed in /userdata/system/configs/emu
+lationstation/scripts/controller-connected and /userdata/system/configs/emu
+lationstation/scripts/controller-disconnected, the scripts must be executable (execution bit should be set for them to be triggered)
+
+Enable this functionality by running:
+
+```bash
+wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main/enable-controller-connected-and-disconnected-script-hooks.sh | bash
 
 ## NOTE: 
 
