@@ -65,6 +65,21 @@ wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/hea
 This functionality will be enabled by default, you can disable it under Main Menu -> System Settings -> Services -> suspend_after_last_controller_disconnected
 ---
 
+
+## Add Failsafe mechanism
+
+This will restart your system if it is not showing any colors in the screen after 40 seconds of boot.
+Helpful when the boot process fails and you are left with a black screen of with a terminal full infinite logs.
+
+> Warning: This patch is not recommended as it can cause boot loop issues.
+
+To get the functionality, run this script in F1/xterm or via ssh:
+
+```bash
+wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main/enable-failsafe.sh | bash
+```
+---
+
 ## NOTE: 
 
 The -O- part in the wget command is **the vowel O in uppercase**, it's not a zero or a lowercase o.
