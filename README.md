@@ -44,14 +44,26 @@ Note: these hooks pass no arguments to the scripts
 
 ## Hooks for joystick added or removed
 
-Enable hooks for scripts placed in /userdata/system/configs/emu
-lationstation/scripts/controller-connected and /userdata/system/configs/emu
-lationstation/scripts/controller-disconnected, the scripts must be executable (execution bit should be set for them to be triggered)
+Enable hooks for scripts placed in /userdata/system/configs/emulationstation/scripts/controller-connected and /userdata/system/configs/emulationstation/scripts/controller-disconnected, the scripts must be executable (execution bit should be set for them to be triggered)
 
 Enable this functionality by running:
 
 ```bash
 wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main/enable-controller-connected-and-disconnected-script-hooks.sh | bash
+```
+
+---
+
+## Suspend system after last connected joystick is disconnected/turned off
+
+To get the functionality, run this script in F1/xterm or via ssh:
+
+```bash
+wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main/suspend-system-on-last-controller-disconnected.sh | bash
+```
+
+This functionality will be enabled by default, you can disable it under Main Menu -> System Settings -> Services -> suspend_after_last_controller_disconnected
+---
 
 ## NOTE: 
 

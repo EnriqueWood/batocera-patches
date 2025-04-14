@@ -1,0 +1,40 @@
+#!/bin/bash
+SERVICE_NAME="$(basename $0)"
+LOG_FILE="/userdata/system/logs/service-$SERVICE_NAME.log"
+
+log() {
+  echo "$@"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') $@" >> "$LOG_FILE"
+}
+
+start() {
+    log "System will be suspend after last controller is disconnected"
+}
+
+stop() {
+  log "System will not be suspend after last controller is disconnected"
+}
+
+status() {
+  if [[ "$(batocera-services list | grep -Po "(?<=${SERVICE_NAME};)[*-]")" == '*' ]]; then
+    log "$SERVICE_NAME is running"
+  else
+    log "$SERVICE_NAME is not running"
+  fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status}"
+        exit 1
+        ;;
+esac
