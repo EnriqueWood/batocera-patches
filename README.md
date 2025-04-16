@@ -25,7 +25,7 @@ Note: To be able to wake your system, it has to be in Suspension mode `Main Menu
 
 ---
 
-## Hooks for suspend and resume events
+## Hooks for suspend and resume events (this patch is already included in the official repo for Batocera v42)
 
 Enable hooks for scripts placed in /userdata/system/configs/emulationstation/scripts/suspend and /userdata/system/configs/emu
 lationstation/scripts/resume, the scripts must be executable (execution bit should be set for them to be triggered)
