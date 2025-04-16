@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#Only execute this in the boot, not in the shutdown
+[[ "$1" != "start" ]] && exit 0
+
 AVOID_AUTO_RESTART_FLAG='/userdata/noautorestart'
 SAMPLE_IMAGE_WIDTH=10
 SAMPLE_IMAGE_HEIGHT=10
