@@ -1,6 +1,6 @@
 # batocera-patches
 
-This repo is to test new ideas or patch functionalities in batocera.
+This repo is to test new ideas or patch functionalities in Batocera.
 
 Everything here is tested in v41 stable, but should work in butterfly/beta and lower versions as well
 
@@ -9,79 +9,138 @@ Everything here is tested in v41 stable, but should work in butterfly/beta and l
 
 This allows you to wake up your console from sleep/suspension by turning on your bluetooth controller.
 
-To enable this functionality in your system, just run on f1/xterm or via ssh to your batocera machine the following command:
+To enable this functionality in your system, just run on f1/xterm or via ssh to your Batocera machine the following command:
 
 ```bash
-wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main/enable-wake-on-bluetooth.sh | bash
+curl -fsSL https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/enable-wake-on-bluetooth | bash
 ```
 
 This will create a service in `Main Menu -> System Settings -> Services -> WAKE_ON_BLUETOOTH`, where you can toggle it on or off. 
 
+> 💡 Your system must be in Suspend Mode (Main Menu -> Quit -> Suspend System) to be woken up. 
+> ⚠️ Power-off won't work.
+
 #### The service is enabled by default.
 
-✔️ Tested with Ps4, Ps5 (DualSense) and Xbox One controllers.
+✅ Tested with Ps4, Ps5 (DualSense) and Xbox One controllers.
 
 Note: To be able to wake your system, it has to be in Suspension mode `Main Menu -> Quit -> Suspend System` instead of powered off.
 
 ---
 
-## Hooks for suspend and resume events (this patch is already included in the official repo for Batocera v42)
+## Hooks for suspend and resume events (Already merged in Batocera v42+)
 
-Enable hooks for scripts placed in /userdata/system/configs/emulationstation/scripts/suspend and /userdata/system/configs/emu
-lationstation/scripts/resume, the scripts must be executable (execution bit should be set for them to be triggered)
+Enable hooks for custom scripts located in:
 
-Enable this functionality by running:
+* `/userdata/system/configs/emulationstation/scripts/suspend`
+
+* `/userdata/system/configs/emulationstation/scripts/resume`
+
+> Scripts must be executable to be triggered.
+
+
+Install with:
 
 ```bash
-wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main/enable-suspend-resume-user-script-hooks.sh | bash
+curl -fsSL https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/enable-suspend-resume-user-script-hooks | bash
 ```
 
 This hook is very useful to do something like calling a wakeonlan/poweroff service from your home assistant to turn on or off your TV, making the experience more console-like.
 
-Note: these hooks pass no arguments to the scripts
+> ⚠️ These hooks do not receive any arguments.
 
 ---
 
 ## Hooks for joystick added or removed
 
-Enable hooks for scripts placed in /userdata/system/configs/emulationstation/scripts/controller-connected and /userdata/system/configs/emulationstation/scripts/controller-disconnected, the scripts must be executable (execution bit should be set for them to be triggered)
+Enable user scripts when a controller is connected or disconnected:
 
-Enable this functionality by running:
+* `/userdata/system/configs/emulationstation/scripts/controller-connected`
+
+* `/userdata/system/configs/emulationstation/scripts/controller-disconnected`
+
+Scripts **must** be executable.
+
+Install with:
 
 ```bash
-wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main/enable-controller-connected-and-disconnected-script-hooks.sh | bash
+curl -fsSL https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/enable-controller-connected-and-disconnected-script-hooks | bash
 ```
 
 ---
 
-## Suspend system after last connected joystick is disconnected/turned off
+## Suspend system when last controller disconnects
 
-To get the functionality, run this script in F1/xterm or via ssh:
+Automatically suspends the system when the last connected controller is turned off or disconnected.
+
+
+Install with:
 
 ```bash
-wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main/suspend-system-on-last-controller-disconnected.sh | bash
+curl -fsSL https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/suspend-system-on-last-controller-disconnected | bash
 ```
 
 This functionality will be enabled by default, you can disable it under Main Menu -> System Settings -> Services -> suspend_after_last_controller_disconnected
----
 
+Enabled by default.
+
+You can disable it in: `Main Menu -> System Settings -> Services -> suspend_after_last_controller_disconnected`
+
+---
 
 ## Add Failsafe mechanism
 
-This will restart your system if it is not showing any colors in the screen after 40 seconds of boot.
-Helpful when the boot process fails and you are left with a black screen of with a terminal full infinite logs.
+This will automatically restart your system if EmulationStation fails to start within 50 seconds of boot.
 
-> Warning: This patch is not recommended as it can cause boot loop issues.
+Helpful when the boot process hangs or crashes, leaving the screen stuck or showing only logs.
 
-To get the functionality, run this script in F1/xterm or via ssh:
+⚠️ Warning: This patch is not recommended if you're debugging, as it can cause automatic reboots.
+
+To enable it, run this script in F1/xterm or via SSH:
+```bash
+curl -fsSL https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/enable-failsafe | bash
+```
+
+## Prevent automatic reboots
+To temporarily disable the failsafe auto-reboot behavior, create an empty file named `noautorestart` inside the `/userdata` folder.
+
+### Option 1: Using another computer
+If you remove the Batocera USB or drive and connect it to another machine, create an empty file named  `noautorestart`  in the root of the SHARE partition:
+
+
+### Option 2: Using SSH
+
+If Batocera is reachable over SSH, you can run:
 
 ```bash
-wget -O- https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main/enable-failsafe.sh | bash
+touch noautorestart && scp noautorestart root@batocera:/userdata/noautorestart && rm noautorestart
 ```
+
+Once this file exists, the system will no longer reboot automatically on failed boots.
+
+To re-enable the failsafe, simply delete the file via Batocera's file manager or via ssh:
+
+```bash
+ssh root@batocera rm /userdata/noautorestart
+```
+
 ---
 
-## NOTE: 
+## Install/Update all patches at once
 
-The -O- part in the wget command is **the vowel O in uppercase**, it's not a zero or a lowercase o.
+If you want to install or update all available patches in one step, you can use the all installer script. 
 
-### Your feedback is always welcomed.
+This includes:
+
+* Wake on Bluetooth
+* Suspend/Resume hooks
+* Controller connect/disconnect hooks
+* Suspend on last controller disconnect 
+* Failsafe boot mechanism
+
+Run this command via SSH/Xterm or in Batocera's file manager (F1):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/all | bash
+```
+### Your feedback is always welcome.

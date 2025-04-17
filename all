@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+REPO_URL="https://raw.githubusercontent.com/EnriqueWood/batocera-patches/refs/heads/main"
+
+SCRIPTS=(
+  enable-wake-on-bluetooth
+  enable-suspend-resume-user-script-hooks
+  enable-controller-connected-and-disconnected-script-hooks
+  suspend-system-on-last-controller-disconnected
+  enable-failsafe
+)
+
+echo "== Batocera Patches Installer =="
+
+for script in "${SCRIPTS[@]}"; do
+  echo
+  echo "== Installing: $script =="
+  curl -fsSL "$REPO_URL/$script" | bash
+done
+
+echo
+echo "✅ All patches installed successfully."
