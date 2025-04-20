@@ -1,0 +1,82 @@
+#!/bin/bash
+
+HOTKEY="BTN_SELECT"
+
+# Mapping generation
+if [[ "$1" == "--generate-mappings" || "$1" == "-g" ]]; then
+  mapfile -t all_buttons < <(thd --listevents | grep BTN_ | grep -v "$HOTKEY")
+  echo "ABS_HAT0Y+$HOTKEY 1 /bin/bash /userdata/system/bin/handle_combo ABS_HAT0Y $HOTKEY"
+  echo "ABS_HAT0Y+$HOTKEY -1 /bin/bash /userdata/system/bin/handle_combo ABS_HAT0Y-1 $HOTKEY"
+  echo "ABS_HAT0X+$HOTKEY 1 /bin/bash /userdata/system/bin/handle_combo ABS_HAT0X $HOTKEY"
+  echo "ABS_HAT0X+$HOTKEY -1 /bin/bash /userdata/system/bin/handle_combo ABS_HAT0X-1 $HOTKEY"
+  for btn in "${all_buttons[@]}"; do
+    echo "$btn+$HOTKEY 1 /bin/bash /userdata/system/bin/handle_combo $btn $HOTKEY"
+  done
+  exit 0
+fi
+
+LOG="/userdata/system/logs/triggerhappy-combo.log"
+
+log() {
+  echo "$@"
+  echo "$@" >> $LOG
+}
+
+
+# Format: [COMBO]="Description|Command"
+declare -A actions=(
+  ["ABS_HAT0Y+BTN_SELECT"]="Toggle TV|curl -s http://192.168.1.160:8123/api/webhook/bedroom-tv-toggle"
+  ["ABS_HAT0X+BTN_SELECT"]="Toggle Sound|curl -s http://192.168.1.160:8123/api/webhook/sound-toggle"
+  ["BTN_TR+BTN_SELECT"]="Volume UP|curl -s http://192.168.1.160:8123/api/webhook/ht-sound-volume-up"
+  ["BTN_TL+BTN_SELECT"]="Volume DOWN|curl -s http://192.168.1.160:8123/api/webhook/ht-sound-volume-down"
+  ["ABS_HAT0Y+BTN_TL+BTN_SELECT"]="Start light OFF|curl -s http://192.168.1.160:8123/api/webhook/stairs-light-off"
+  ["BTN_SELECT+BTN_THUMBR"]="Toggle lights|curl -s http://192.168.1.160:8123/api/webhook/room-light-toggle"
+  ["ABS_HAT0Y+BTN_TR+BTN_SELECT"]="Lights +|curl -s http://192.168.1.160:8123/api/webhook/room-light-bright-up"
+  ["ABS_HAT0Y+BTN_TL+BTN_SELECT"]="Lights -|curl -s http://192.168.1.160:8123/api/webhook/room-light-bright-down"
+  ["BTN_X+BTN_SELECT"]="Show Help|show_help"
+)
+
+show_help() {
+  output=""
+  for combo in "${!actions[@]}"; do
+    IFS='|' read -r desc _ <<< "${actions[$combo]}"
+    output+="$combo: $desc\n"
+  done
+  echo -e "$output"
+  SECONDS_ON_SCREEN=15
+  FONT_SIZE=32
+  if [ -n "$output" ]; then
+    killall osd_cat 2>/dev/null
+    echo -e "$output" | LANG=en_US HOME=/userdata/system XAUTHORITY=/var/lib/.Xauthority DISPLAY=:0.0 \
+    osd_cat -f -*-*-bold-*-*-*-$FONT_SIZE-1200-*-*-*-*-*-* -cred -s 4 -d $SECONDS_ON_SCREEN -l 30
+  fi
+}
+
+# Normalize input
+sorted=($(for arg in "$@"; do echo "$arg"; done | sort))
+key=$(IFS=+; echo "${sorted[*]}")
+log "$(date '+%F %T') - Combo: $key"
+
+# Check for coincidences
+for combo in "${!actions[@]}"; do
+  combo_sorted=$(echo "$combo" | tr '+' '\n' | sort | tr '\n' '+' | sed 's/+*$//')
+  if [[ "$combo_sorted" == "$key" ]]; then
+    IFS='|' read -r desc cmd <<< "${actions[$combo]}"
+    log "Action: $desc ($combo)"
+    killall osd_cat 2>/dev/null
+    echo -e "$desc" | LANG=en_US HOME=/userdata/system XAUTHORITY=/var/lib/.Xauthority DISPLAY=:0.0 \
+      osd_cat -f -*-*-bold-*-*-*-32-1200-*-*-*-*-*-* -cred -s 4 -d 2 -l 30 &
+
+    if [[ "$cmd" == "show_help" ]]; then
+      show_help
+    else
+      eval "$cmd"
+    fi
+    exit 0
+  fi
+done
+
+# No coincidences
+echo "⚠️ Not a combo: $key"
+echo -e "Not a combo $key" | LANG=en_US HOME=/userdata/system XAUTHORITY=/var/lib/.Xauthority DISPLAY=:0.0 \
+      osd_cat -f -*-*-bold-*-*-*-32-1200-*-*-*-*-*-* -cred -s 4 -d 1 -l 30 &
