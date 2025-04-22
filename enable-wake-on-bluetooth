@@ -1,5 +1,7 @@
 #!/bin/bash
 ## This script enables wake from suspension capabilities to every bluetooth device (useful for bluetooth controllers)
+mkdir -p "/userdata/system/logs/"
+mkdir -p "/userdata/system/services/"
 
 cat <<EOF2 > /userdata/system/services/wake_on_bluetooth
 #!/bin/bash

@@ -1,6 +1,6 @@
 #!/bin/bash
 ## Add hooks for all user-defined scripts located in /userdata/system/configs/emulationstation/scripts/suspend and /userdata/system/configs/emulationstation/resume directories upon system suspend and resume (wake-up from suspension) events
-
+mkdir -p "/etc/pm/sleep.d/"
 DEST=/etc/pm/sleep.d/99user_scripts_runner
 URL="https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/extras$DEST"
 
