@@ -15,6 +15,7 @@ log() {
 start() {
   cat <<EOF1 > /etc/pm/sleep.d/99enable_wake_on_bluetooth
 #!/bin/bash
+[[ "\\\$1" == "resume" ]] && exit 0
 for dev in /sys/class/bluetooth/*; do
   [[ -f /sys/bus/usb/devices/\\\$(readlink -f "\\\$dev" | grep -Po "(?<=usb\d/)[^/]+")/power/wakeup ]] && echo 'enabled' > "/sys/bus/usb/devices/\\\$(readlink -f "\\\$dev" | grep -Po "(?<=usb\d/)[^/]+")/power/wakeup"
 done
