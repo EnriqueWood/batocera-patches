@@ -2,7 +2,7 @@
 
 LOG="/userdata/system/logs/triggerhappy-combo.log"
 MAIN_PID=$$
-WAIT_TIMEOUT=3
+WAIT_TIMEOUT=4
 FOUND_FILE=$(mktemp)
 PIDS=()
 
@@ -32,10 +32,10 @@ osd_print() {
 }
 
 log "Looking for BTN_MODE in /dev/input/event*"
-
+osd_print "Tap again to turn off"
 monitor_device() {
   dev="$1"
-  timeout 2 evtest "$dev" 2>/dev/null | while read -r line; do
+  timeout 3 evtest "$dev" 2>/dev/null | while read -r line; do
     if echo "$line" | grep -q "BTN_MODE.*value 1"; then
       log "Detected BTN_MODE on $dev"
       echo "$dev" > "$FOUND_FILE"
@@ -86,7 +86,7 @@ if [ ! -e "$EVENT_DEV" ]; then
 fi
 
 DEVPATH=$(udevadm info -q property -n "$EVENT_DEV" | grep "^DEVPATH=" | cut -d= -f2)
-BT_ID=$(echo "$DEVPATH" | grep -oE '0005:[0-9A-Fa-f]+:[0-9A-Fa-f]+\.?[0-9]*')
+BT_ID=$(echo "$DEVPATH" | grep -oE '[0-0A-Fa-f]+:[0-9A-Fa-f]+:[0-9A-Fa-f]+\.?[0-9]*')
 EVENT=$(basename "$EVENT_DEV")
 SYS_PATH=$(readlink -f /sys/class/input/$EVENT/device/../..)
 MAC=$(grep HID_UNIQ "$SYS_PATH/uevent" | cut -d= -f2)
