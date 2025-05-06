@@ -126,6 +126,30 @@ ssh root@batocera rm /userdata/noautorestart
 
 ---
 
+## Turn off Bluetooth controllers with a double-tap
+
+This patch allows you to quickly power off your Bluetooth controller by double-tapping the power button, without needing to navigate any menu.
+
+Install it with:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/quick-power-off-bt-controller | bash
+```
+
+Once installed, you’ll find the service in
+`Main Menu -> System Settings -> Services -> DOUBLE_TAP_TURNOFF`
+
+✅ Compatible with PS4, PS5 (DualSense), and most generic Bluetooth controllers.
+❌ Not compatible with Xbox One controllers — they automatically reconnect right after being powered off, making this feature ineffective.
+
+The service is enabled by default. You can disable it anytime from the Services menu.
+
+
+⚠️i WARNING: The system will automatically reboot once after installation to apply the changes.
+
+
+---
+
 ## Install/Update all patches at once
 
 If you want to install or update all available patches in one step, you can use the all installer script. 

@@ -1,0 +1,103 @@
+#!/bin/bash
+
+LOG="/userdata/system/logs/triggerhappy-combo.log"
+MAIN_PID=$$
+WAIT_TIMEOUT=3
+FOUND_FILE=$(mktemp)
+PIDS=()
+
+log() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%3N')] $*" | tee -a "$LOG"
+}
+
+cleanup() {
+  log "Interrupt received. Killing child processes."
+  for pid in "${PIDS[@]}"; do
+    if kill -0 "$pid" 2>/dev/null; then
+      log "Killing PID $pid"
+      kill -9 "$pid" 2>/dev/null
+    fi
+  done
+  rm -f "$FOUND_FILE"
+  log "Cleanup complete. Exiting."
+  exit 0
+}
+
+trap cleanup INT TERM
+
+osd_print() {
+  killall osd_cat 2>/dev/null
+  echo -e "$1" | LANG=en_US HOME=/userdata/system XAUTHORITY=/var/lib/.Xauthority DISPLAY=:0.0 \
+    osd_cat -f -*-*-bold-*-*-*-32-1200-*-*-*-*-*-* -cred -s 4 -d 2 -l 30 &
+}
+
+log "Looking for BTN_MODE in /dev/input/event*"
+
+monitor_device() {
+  dev="$1"
+  timeout 2 evtest "$dev" 2>/dev/null | while read -r line; do
+    if echo "$line" | grep -q "BTN_MODE.*value 1"; then
+      log "Detected BTN_MODE on $dev"
+      echo "$dev" > "$FOUND_FILE"
+      pkill -P "$MAIN_PID" evtest
+      break
+    fi
+  done
+}
+
+for dev in /dev/input/event*; do
+  monitor_device "$dev" &
+  pid=$!
+  log "Started monitor_device for $dev (PID $pid)"
+  PIDS+=("$pid")
+done
+
+END_TIME=$((SECONDS + WAIT_TIMEOUT))
+while [ ! -s "$FOUND_FILE" ] && [ $SECONDS -lt $END_TIME ]; do
+  sleep 0.1
+done
+
+if [ ! -s "$FOUND_FILE" ]; then
+  log "No button press detected. Exiting after $WAIT_TIMEOUT seconds."
+  for pid in "${PIDS[@]}"; do
+    if kill -0 "$pid" 2>/dev/null; then
+      log "Timeout: killing PID $pid"
+      kill -9 "$pid" 2>/dev/null
+    fi
+  done
+  rm -f "$FOUND_FILE"
+  exit 0
+fi
+
+EVENT_DEV=$(cat "$FOUND_FILE")
+log "Selected input: $EVENT_DEV"
+rm -f "$FOUND_FILE"
+
+for pid in "${PIDS[@]}"; do
+  if kill -0 "$pid" 2>/dev/null; then
+    log "Final cleanup: killing PID $pid"
+    kill -9 "$pid" 2>/dev/null
+  fi
+done
+
+if [ ! -e "$EVENT_DEV" ]; then
+  log "Input device not found: $EVENT_DEV"
+  exit 1
+fi
+
+DEVPATH=$(udevadm info -q property -n "$EVENT_DEV" | grep "^DEVPATH=" | cut -d= -f2)
+BT_ID=$(echo "$DEVPATH" | grep -oE '0005:[0-9A-Fa-f]+:[0-9A-Fa-f]+\.?[0-9]*')
+EVENT=$(basename "$EVENT_DEV")
+SYS_PATH=$(readlink -f /sys/class/input/$EVENT/device/../..)
+MAC=$(grep HID_UNIQ "$SYS_PATH/uevent" | cut -d= -f2)
+
+if [ -n "$MAC" ]; then
+  log "Disconnecting $MAC via bluetoothctl"
+  bluetoothctl disconnect "$MAC"
+else
+  log "MAC not found for $EVENT_DEV"
+fi
+
+log "Cleanup complete. Exiting."
+exit 0
+

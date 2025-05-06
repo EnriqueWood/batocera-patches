@@ -1,0 +1,65 @@
+#!/bin/bash
+SERVICE_NAME="$(basename "$0")"
+LOG_FILE="/userdata/system/logs/service-$SERVICE_NAME.log"
+
+CONFIG_FILE="/etc/triggerhappy/triggers.d/multimedia_keys.conf"
+BINARIES_FOLDER="/userdata/system/bin"
+DEST="$BINARIES_FOLDER/double_tap_controller_turnoff"
+DISABLED_DEST="$DEST.bak"
+LINE="BTN_MODE 1 /bin/bash $DEST"
+
+log() {
+  echo "$@"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') $@" >> "$LOG_FILE"
+}
+
+start() {
+  grep -Fxq "$LINE" "$CONFIG_FILE" 2>/dev/null || echo "$LINE" >> "$CONFIG_FILE"
+  log "TriggerHappy line added"
+
+  if [ -f "$DISABLED_DEST" ]; then
+    mv "$DISABLED_DEST" "$DEST"
+    log "Restored script from $DISABLED_DEST to $DEST"
+  fi
+
+  log "Bluetooth controllers will be powered off with double tap after a restart"
+}
+
+stop() {
+  if [ -f "$DEST" ]; then
+    mv "$DEST" "$DISABLED_DEST"
+    log "Script moved to $DISABLED_DEST"
+  fi
+
+  if [ -f "$CONFIG_FILE" ]; then
+    grep -Fxv "$LINE" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+    log "Removed TriggerHappy line from config"
+  fi
+
+  log "Bluetooth controllers will NOT be powered off with double tap"
+}
+
+status() {
+  if [[ "$(batocera-services list | grep -Po "(?<=${SERVICE_NAME};)[*-]")" == '*' ]]; then
+    log "$SERVICE_NAME is running"
+  else
+    log "$SERVICE_NAME is not running"
+  fi
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  status)
+    status
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|status}"
+    exit 1
+    ;;
+esac
+

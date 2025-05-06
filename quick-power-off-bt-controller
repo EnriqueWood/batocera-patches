@@ -1,0 +1,18 @@
+#!/bin/bash
+BINARIES_FOLDER="/userdata/system/bin"
+SERVICES_FOLDER="/userdata/system/services"
+mkdir -p "$BINARIES_FOLDER"
+mkdir -p "SERVICES_FOLDER"
+
+DEST="$BINARIES_FOLDER/double_tap_controller_turnoff"
+URL="https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/extras$DEST"
+wget -q -O "$DEST" "$URL"
+chmod +x "$DEST"
+
+DEST="$SERVICES_FOLDER/easy_joystick_poweroff"
+URL="https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/extras$DEST"
+wget -q -O "$DEST" "$URL"
+chmod +x "$DEST"
+batocera-services enable easy_joystick_poweroff
+batocera-services start easy_joystick_poweroff
+reboot
