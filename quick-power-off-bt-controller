@@ -15,4 +15,4 @@ wget -q -O "$DEST" "$URL"
 chmod +x "$DEST"
 batocera-services enable easy_joystick_poweroff
 batocera-services start easy_joystick_poweroff
-reboot
+/etc/init.d/S50triggerhappy restart

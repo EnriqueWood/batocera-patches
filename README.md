@@ -145,9 +145,6 @@ Once installed, you’ll find the service in
 The service is enabled by default. You can disable it anytime from the Services menu.
 
 
-⚠️i WARNING: The system will automatically reboot once after installation to apply the changes.
-
-
 ---
 
 ## Install/Update all patches at once

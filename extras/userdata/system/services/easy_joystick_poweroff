@@ -21,7 +21,7 @@ start() {
     mv "$DISABLED_DEST" "$DEST"
     log "Restored script from $DISABLED_DEST to $DEST"
   fi
-
+  /etc/init.d/S50triggerhappy restart
   log "Bluetooth controllers will be powered off with double tap after a restart"
 }
 
@@ -35,7 +35,7 @@ stop() {
     grep -Fxv "$LINE" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
     log "Removed TriggerHappy line from config"
   fi
-
+  /etc/init.d/S50triggerhappy restart
   log "Bluetooth controllers will NOT be powered off with double tap"
 }
 
