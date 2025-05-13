@@ -2,7 +2,7 @@
 
 LOG="/userdata/system/logs/triggerhappy-combo.log"
 MAIN_PID=$$
-WAIT_TIMEOUT=4
+WAIT_TIMEOUT=2
 FOUND_FILE=$(mktemp)
 PIDS=()
 
@@ -25,14 +25,32 @@ cleanup() {
 
 trap cleanup INT TERM
 
+# returns: 1 = In game, return 0 = Not in game
+is_ingame() {
+  HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:1234/runningGame")
+  test $? != 0 && return 1
+  test "${HTTP_STATUS}" != 201 && return 0
+  return 1
+}
+
 osd_print() {
   killall osd_cat 2>/dev/null
   echo -e "$1" | LANG=en_US HOME=/userdata/system XAUTHORITY=/var/lib/.Xauthority DISPLAY=:0.0 \
-    osd_cat -f -*-*-bold-*-*-*-32-1200-*-*-*-*-*-* -cred -s 4 -d 2 -l 30 &
+    osd_cat -f -*-*-bold-*-*-*-26-1200-*-*-*-*-*-* -cred -s 4 -d 4 -l 80 &
 }
 
+notify() {
+  osd_print "$1"
+}
+
+
+if is_ingame; then
+  exit;
+fi
+
 log "Looking for BTN_MODE in /dev/input/event*"
-osd_print "Tap again to turn off"
+notify "Tap again to turn off"
+
 monitor_device() {
   dev="$1"
   timeout 3 evtest "$dev" 2>/dev/null | while read -r line; do
