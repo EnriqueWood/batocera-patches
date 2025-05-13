@@ -1,6 +1,15 @@
 #!/bin/bash
 SERVICE_NAME=suspend_after_last_controller_disconnected
 LOG_FILE="/userdata/system/logs/service-$SERVICE_NAME.log"
+LOCK_FILE="/var/run/pm-utils/locks/pm-suspend.lock"
+LOCK_MAX_AGE_SECONDS=20
+
+if [[ -f "$LOCK_FILE" ]]; then
+  LOCK_AGE=$(( $(date +%s) - $(stat -c %Y "$LOCK_FILE") ))
+  if (( LOCK_AGE > LOCK_MAX_AGE_SECONDS )); then
+    rm -f "$LOCK_FILE"
+  fi
+fi
 
 log() {
   echo "$@"
@@ -25,6 +34,6 @@ log "Controller disconnected, new controller count is now $count"
 
 if [[ $count -eq 0 ]]; then
   log "Last controller disconnected, suspending system"
-  pm-suspend
+  /usr/sbin/pm-suspend
 fi
 
