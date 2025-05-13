@@ -139,8 +139,10 @@ curl -fsSL https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/q
 Once installed, you’ll find the service in
 `Main Menu -> System Settings -> Services -> DOUBLE_TAP_TURNOFF`
 
+✅ Won't turn off any controllers while in game
 ✅ Compatible with PS4, PS5 (DualSense), and most generic Bluetooth controllers.
 ❌ Not compatible with Xbox One controllers — they automatically reconnect right after being powered off, making this feature ineffective.
+
 
 The service is enabled by default. You can disable it anytime from the Services menu.
 
