@@ -160,6 +160,7 @@ This includes:
 * Controller connect/disconnect hooks
 * Suspend on last controller disconnect 
 * Failsafe boot mechanism
+* Double tap PS button to power off controller
 
 Run this command via SSH/Xterm or in Batocera's file manager (F1):
 

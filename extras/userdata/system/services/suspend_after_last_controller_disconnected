@@ -4,7 +4,7 @@ LOG_FILE="/userdata/system/logs/service-$SERVICE_NAME.log"
 
 log() {
   echo "$@"
-  echo "$(date '+%Y-%m-%d %H:%M:%S') $@" >> "$LOG_FILE"
+  echo "$(date "+%F %H-%M-%S.%3N") $@" >> "$LOG_FILE"
 }
 
 start() {

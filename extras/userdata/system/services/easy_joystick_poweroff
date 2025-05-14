@@ -10,7 +10,7 @@ LINE="BTN_MODE 1 /bin/bash $DEST"
 
 log() {
   echo "$@"
-  echo "$(date '+%Y-%m-%d %H:%M:%S') $@" >> "$LOG_FILE"
+  echo "$(date "+%F %H-%M-%S.%3N") $@" >> "$LOG_FILE"
 }
 
 start() {

@@ -1,18 +1,22 @@
 #!/bin/bash
 BINARIES_FOLDER="/userdata/system/bin"
 SERVICES_FOLDER="/userdata/system/services"
+SERVICE_NAME="easy_joystick_poweroff"
+
 mkdir -p "$BINARIES_FOLDER"
-mkdir -p "SERVICES_FOLDER"
+mkdir -p "$SERVICES_FOLDER"
 
 DEST="$BINARIES_FOLDER/double_tap_controller_turnoff"
 URL="https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/extras$DEST"
 wget -q -O "$DEST" "$URL"
 chmod +x "$DEST"
 
-DEST="$SERVICES_FOLDER/easy_joystick_poweroff"
+DEST="$SERVICES_FOLDER/$SERVICE_NAME"
 URL="https://raw.githubusercontent.com/EnriqueWood/batocera-patches/main/extras$DEST"
 wget -q -O "$DEST" "$URL"
 chmod +x "$DEST"
-batocera-services enable easy_joystick_poweroff
-batocera-services start easy_joystick_poweroff
+
+batocera-services enable "$SERVICE_NAME"
+batocera-services start "$SERVICE_NAME"
+
 /etc/init.d/S50triggerhappy restart

@@ -7,7 +7,7 @@ FOUND_FILE=$(mktemp)
 PIDS=()
 
 log() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S.%3N')] $*" | tee -a "$LOG"
+  echo "$(date "+%F %H-%M-%S.%3N") $*" | tee -a "$LOG"
 }
 
 cleanup() {
@@ -26,7 +26,7 @@ cleanup() {
 trap cleanup INT TERM
 
 # returns: 1 = In game, return 0 = Not in game
-is_ingame() {
+is_in_game() {
   HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:1234/runningGame")
   test $? != 0 && return 1
   test "${HTTP_STATUS}" != 201 && return 0
@@ -44,7 +44,7 @@ notify() {
 }
 
 
-if is_ingame; then
+if is_in_game; then
   exit;
 fi
 
